@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 
 # Read the airline data into pandas dataframe
-spacex_df = pd.read_csv("spacex_launch_dash.csv")
+spacex_df = pd.read_csv("week3\spacex_launch_geo.csv")
 max_payload = spacex_df['Payload Mass (kg)'].max()
 min_payload = spacex_df['Payload Mass (kg)'].min()
 
@@ -63,12 +63,9 @@ def get_pie_chart(entered_site):
                      names='Launch Site', 
                      title='Total Success Launches By Site')        
     else:
-        filtered_df = spacex_df[spacex_df['Launch Site'] == entered_site]
-        filtered_df = filtered_df.groupby('class').count().reset_index()        
-        fig = px.pie(filtered_df, 
-                     values='Unnamed: 0', 
-                     names='class', 
-                     title='Total Launches for site {}'.format(entered_site))        
+        fig = px.pie(values=spacex_df[spacex_df['Launch Site']==str(entered_site)]['class'].value_counts(normalize=True), 
+                     names=spacex_df['class'].unique(), 
+                     title='Total Success Launches for Site {}'.format(entered_site))
         # return the outcomes piechart for a selected site
     return fig
         
@@ -83,13 +80,13 @@ def get_scatter_chart(entered_site, payload_range):
         filtered_df = spacex_df[(spacex_df['Payload Mass (kg)'] >= int(payload_range[0])) &
                                 (spacex_df['Payload Mass (kg)'] <= int(payload_range[1]))
                                ]
-        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y='class', color='Booster Version Category', title='All sites - payload mass between {:8,d}kg and {:8,d}kg'.format(int(payload_range[0]),int(payload_range[1])))
+        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y='class', color='Booster Version', title='All sites - payload mass between {:8,d}kg and {:8,d}kg'.format(int(payload_range[0]),int(payload_range[1])))
     else:
         filtered_df = spacex_df[(spacex_df['Launch Site'] == entered_site) & 
                                 (spacex_df['Payload Mass (kg)'] >= int(payload_range[0])) &
                                 (spacex_df['Payload Mass (kg)'] <= int(payload_range[1]))
                                ]
-        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y='class', color='Booster Version Category', title='Site {} - payload mass between {:8,d}kg and {:8,d}kg'.format(entered_site,int(payload_range[0]),int(payload_range[1])))
+        fig = px.scatter(filtered_df, x='Payload Mass (kg)', y='class', color='Booster Version', title='Site {} - payload mass between {:8,d}kg and {:8,d}kg'.format(entered_site,int(payload_range[0]),int(payload_range[1])))
     
     return fig
 
